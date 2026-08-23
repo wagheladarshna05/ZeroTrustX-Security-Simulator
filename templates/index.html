@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>ZeroTrustX · SOC Dashboard</title>
+
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+  >
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap"
+    rel="stylesheet"
+  >
+
+  <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/style.css') }}"
+  >
+</head>
+
+<body>
+
+  <!-- SIDEBAR -->
+
+  <aside class="sidebar">
+
+    <div class="logo">
+      <i class="fas fa-shield-halved"></i>
+    </div>
+
+    <ul class="nav-list">
+
+      <!-- 1. DASHBOARD -->
+      <li>
+        <a href="/" class="active">
+          <i class="fas fa-gauge-high"></i>
+          <span class="label">Dashboard</span>
+        </a>
+      </li>
+
+      <!-- 2. ANALYTICS -->
+      <li>
+        <a href="/analytics">
+          <i class="fas fa-arrow-trend-up"></i>
+          <span class="label">Analytics</span>
+        </a>
+      </li>
+
+      <!-- 3. NETWORK -->
+      <li>
+        <a href="/network">
+          <i class="fas fa-network-wired"></i>
+          <span class="label">Network</span>
+        </a>
+      </li>
+
+      <!-- 4. ACCESS REQUEST -->
+      <li>
+        <a href="/access-request">
+          <i class="fas fa-key"></i>
+          <span class="label">Access Request</span>
+        </a>
+      </li>
+
+      <!-- 5. ALERTS -->
+      <li>
+        <a href="/alerts">
+          <i class="fas fa-bell"></i>
+          <span class="label">Alerts</span>
+        </a>
+      </li>
+
+      <!-- 6. POLICIES -->
+      <li>
+        <a href="/policies">
+          <i class="fas fa-sliders"></i>
+          <span class="label">Policies</span>
+        </a>
+      </li>
+
+    </ul>
+
+    <div class="sidebar-bottom">
+
+      <a
+        href="/profile"
+        class="avatar"
+        title="Admin Profile"
+      >
+        <i class="fas fa-user-astronaut"></i>
+      </a>
+
+    </div>
+
+  </aside>
+
+
+  <!-- MAIN WRAPPER -->
+
+  <div class="main-wrapper">
+
+
+    <!-- TOP BAR -->
+
+    <header class="top-bar">
+
+      <div class="status-left">
+
+        <div class="status-badge">
+          <span class="dot"></span>
+          System • Zero Trust
+        </div>
+
+        <div class="status-badge">
+
+          <i
+            class="fas fa-check-circle"
+            style="color:#3dd68c;"
+          ></i>
+
+          24/7
+
+        </div>
+
+        <div class="status-badge">
+
+          <i class="fas fa-user-shield"></i>
+
+          Zero Trust Policy
+
+        </div>
+
+      </div>
+
+
+      <div class="status-right">
+
+        <i class="fas fa-expand"></i>
+
+
+        <!-- CLICKABLE ALERT BELL -->
+
+        <a
+          href="/alerts"
+          style="
+            color:inherit;
+            text-decoration:none;
+            position:relative;
+          "
+          title="Security Alerts"
+        >
+
+          <i class="fas fa-bell"></i>
+
+          <span
+            style="
+              position:absolute;
+              top:-6px;
+              right:-6px;
+              background:#f47b7b;
+              color:#fff;
+              font-size:10px;
+              padding:1px 6px;
+              border-radius:20px;
+            "
+          >
+            {{ alerts|length }}
+          </span>
+
+        </a>
+
+
+        <span
+          class="time-display"
+          id="liveTime"
+        >
+          --:-- UTC
+        </span>
+
+      </div>
+
+    </header>
+
+
+    <!-- DASHBOARD -->
+
+    <div class="dashboard">
+
+
+      <!-- SUMMARY CARDS -->
+
+      <section class="cards-grid">
+
+
+        <!-- TOTAL USERS -->
+
+        <div class="card card-users">
+
+          <div class="card-label">
+            <i class="fas fa-users"></i>
+            Total Users
+          </div>
+
+          <div class="card-value">
+            {{ total_users }}
+          </div>
+
+          <div class="card-sub">
+            Registered system users
+          </div>
+
+        </div>
+
+
+        <!-- ACCESS REQUESTS -->
+
+        <div class="card card-access">
+
+          <div class="card-label">
+            <i class="fas fa-arrows-spin"></i>
+            Access Requests
+          </div>
+
+          <div class="card-value">
+            {{ access_requests }}
+          </div>
+
+          <div class="card-sub">
+            Total access evaluations
+          </div>
+
+        </div>
+
+
+        <!-- ALLOWED -->
+
+        <div class="card card-allowed">
+
+          <div class="card-label">
+            <i class="fas fa-check-circle"></i>
+            Allowed
+          </div>
+
+          <div class="card-value">
+            {{ allowed }}
+          </div>
+
+          <div class="card-sub">
+
+            {% if access_requests > 0 %}
+
+              {{ ((allowed / access_requests) * 100)|round(1) }}%
+              of requests allowed
+
+            {% else %}
+
+              0% of requests allowed
+
+            {% endif %}
+
+          </div>
+
+        </div>
+
+
+        <!-- BLOCKED -->
+
+        <div class="card card-blocked">
+
+          <div class="card-label">
+            <i class="fas fa-ban"></i>
+            Blocked
+          </div>
+
+          <div class="card-value">
+            {{ blocked }}
+          </div>
+
+          <div class="card-sub">
+
+            {% if access_requests > 0 %}
+
+              {{ ((blocked / access_requests) * 100)|round(1) }}%
+              of requests blocked
+
+            {% else %}
+
+              0% of requests blocked
+
+            {% endif %}
+
+          </div>
+
+        </div>
+
+
+        <!-- RISK SCORE -->
+
+        <div class="card card-risk">
+
+          <div class="card-label">
+            <i class="fas fa-triangle-exclamation"></i>
+            Avg Risk Score
+          </div>
+
+          <div class="card-value">
+            {{ avg_risk_score }}
+          </div>
+
+          <div class="card-sub">
+
+            {% if avg_risk_score >= 80 %}
+
+              High risk
+
+            {% elif avg_risk_score >= 50 %}
+
+              Medium risk
+
+            {% else %}
+
+              Low risk
+
+            {% endif %}
+
+          </div>
+
+        </div>
+
+
+        <!-- ZERO TRUST STATUS -->
+
+        <div
+          class="card"
+          style="
+            background:#101a26;
+            border-color:#2a3f55;
+          "
+        >
+
+          <div class="card-label">
+
+            <i class="fas fa-shield-halved"></i>
+
+            Zero Trust Status
+
+          </div>
+
+          <div
+            class="card-value"
+            style="
+              font-size:22px;
+              display:flex;
+              align-items:center;
+              gap:10px;
+            "
+          >
+
+            <i
+              class="fas fa-shield-check"
+              style="color:#00c8b6;"
+            ></i>
+
+            Active
+
+          </div>
+
+          <div class="card-sub">
+            Continuous verification
+          </div>
+
+        </div>
+
+
+      </section>
+
+
+      <!-- THREE COLUMN SECTION -->
+
+      <section class="three-col">
+
+
+        <!-- RECENT SECURITY ACTIVITY -->
+
+        <div class="panel">
+
+          <div class="panel-header">
+
+            <h4>
+              <i class="fas fa-clock-rotate-left"></i>
+              Recent Security Activity
+            </h4>
+
+            <a
+              href="/analytics"
+              class="more-link"
+              style="text-decoration:none;"
+            >
+              view all
+              <i
+                class="fas fa-chevron-right"
+                style="font-size:10px;"
+              ></i>
+            </a>
+
+          </div>
+
+
+          <div class="activity-list">
+
+            {% if recent_activity %}
+
+              {% for activity in recent_activity %}
+
+              <div class="activity-item">
+
+                <div class="icon-circle">
+
+                  {% if activity[3] == 'BLOCK' %}
+
+                    <i class="fas fa-ban"></i>
+
+                  {% else %}
+
+                    <i class="fas fa-shield-halved"></i>
+
+                  {% endif %}
+
+                </div>
+
+
+                <div class="act-content">
+
+                  <div class="act-title">
+
+                    {{ activity[1] }} request →
+                    {{ activity[0] }}
+
+                  </div>
+
+                  <div class="act-time">
+
+                    Risk Score:
+                    {{ activity[2] }}
+
+                  </div>
+
+                </div>
+
+
+                <span
+                  class="
+                    act-badge
+                    {% if activity[3] == 'ALLOW' %}
+                      allowed
+                    {% elif activity[3] == 'BLOCK' %}
+                      blocked
+                    {% else %}
+                      pending
+                    {% endif %}
+                  "
+                >
+
+                  {{ activity[3] }}
+
+                </span>
+
+              </div>
+
+              {% endfor %}
+
+            {% else %}
+
+              <div class="activity-item">
+
+                <div class="icon-circle">
+                  <i class="fas fa-info"></i>
+                </div>
+
+                <div class="act-content">
+
+                  <div class="act-title">
+                    No security activity yet
+                  </div>
+
+                  <div class="act-time">
+                    Waiting for access requests
+                  </div>
+
+                </div>
+
+              </div>
+
+            {% endif %}
+
+          </div>
+
+        </div>
+
+
+        <!-- ZERO TRUST NETWORK -->
+
+        <div class="panel">
+
+          <div class="panel-header">
+
+            <h4>
+              <i class="fas fa-diagram-project"></i>
+              Zero Trust Network
+            </h4>
+
+            <span class="more-link">
+              live
+            </span>
+
+          </div>
+
+
+          <div class="network-viz">
+
+
+            <div class="viz-row">
+
+              <span class="node">
+                <i class="fas fa-user"></i>
+                User
+              </span>
+
+              <span class="conn-line allow"></span>
+
+              <span class="node">
+                <i class="fas fa-server"></i>
+                App
+              </span>
+
+              <span class="trust-label">
+                ✅ allow
+              </span>
+
+            </div>
+
+
+            <div class="viz-row">
+
+              <span class="node">
+                <i class="fas fa-user"></i>
+                User
+              </span>
+
+              <span class="conn-line"></span>
+
+              <span class="node">
+                <i class="fas fa-database"></i>
+                DB
+              </span>
+
+              <span
+                class="trust-label"
+                style="color:#f47b7b;"
+              >
+                ⛔ deny
+              </span>
+
+            </div>
+
+
+            <div class="viz-row">
+
+              <span class="node">
+                <i class="fas fa-cloud"></i>
+                API
+              </span>
+
+              <span class="conn-line allow"></span>
+
+              <span class="node">
+                <i class="fas fa-globe"></i>
+                Internet
+              </span>
+
+              <span class="trust-label">
+                ✅ allow
+              </span>
+
+            </div>
+
+
+            <div
+              class="viz-row"
+              style="border-left-color:#e8b45a;"
+            >
+
+              <span class="node">
+                <i class="fas fa-bolt"></i>
+                MFA
+              </span>
+
+              <span
+                class="conn-line"
+                style="background:#e8b45a;"
+              ></span>
+
+              <span class="node">
+                <i class="fas fa-user-check"></i>
+                Identity
+              </span>
+
+              <span
+                class="trust-label"
+                style="color:#e8b45a;"
+              >
+                ⏳ verify
+              </span>
+
+            </div>
+
+
+          </div>
+
+        </div>
+
+
+        <!-- ACTIVE SECURITY ALERTS -->
+
+        <div class="panel">
+
+          <div class="panel-header">
+
+            <h4>
+              <i class="fas fa-bell"></i>
+              Active Security Alerts
+            </h4>
+
+            <a
+              href="/alerts"
+              class="more-link"
+              style="text-decoration:none;"
+            >
+              {{ alerts|length }} alerts
+            </a>
+
+          </div>
+
+
+          <div class="alert-list">
+
+            {% if alerts %}
+
+              {% for alert in alerts %}
+
+              <div
+                class="
+                  alert-item
+                  {% if alert[2] == 'CRITICAL' %}
+                    critical
+                  {% elif alert[2] == 'WARNING' %}
+                    warning
+                  {% else %}
+                    info
+                  {% endif %}
+                "
+              >
+
+                <span class="alert-icon">
+
+                  {% if alert[2] == 'CRITICAL' %}
+
+                    <i class="fas fa-circle-exclamation"></i>
+
+                  {% elif alert[2] == 'WARNING' %}
+
+                    <i class="fas fa-triangle-exclamation"></i>
+
+                  {% else %}
+
+                    <i class="fas fa-info-circle"></i>
+
+                  {% endif %}
+
+                </span>
+
+
+                <span class="alert-text">
+                  {{ alert[1] }}
+                </span>
+
+
+                <span class="alert-time">
+
+                  {{ alert[3].strftime('%H:%M') }}
+
+                </span>
+
+              </div>
+
+              {% endfor %}
+
+            {% else %}
+
+              <div class="alert-item info">
+
+                <span class="alert-icon">
+                  <i class="fas fa-circle-check"></i>
+                </span>
+
+                <span class="alert-text">
+                  No active security alerts
+                </span>
+
+              </div>
+
+            {% endif %}
+
+          </div>
+
+        </div>
+
+
+      </section>
+
+
+      <!-- FOOTER -->
+
+      <div
+        style="
+          margin-top:8px;
+          font-size:12px;
+          color:#3a4a62;
+          display:flex;
+          justify-content:flex-end;
+          border-top:1px solid #1d2633;
+          padding-top:16px;
+        "
+      >
+
+        <span>
+
+          <i class="fas fa-shield-halved"></i>
+
+          ZeroTrustX · SOC Dashboard
+
+        </span>
+
+      </div>
+
+
+    </div>
+
+  </div>
+
+
+  <script
+    src="{{ url_for('static', filename='js/dashboard.js') }}"
+  ></script>
+
+</body>
+
+</html>

@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>ZeroTrustX · Analytics</title>
+
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+  >
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  >
+
+  <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/style.css') }}"
+  >
+</head>
+
+<body>
+
+  <aside class="sidebar">
+
+    <div class="logo">
+      <i class="fas fa-shield-halved"></i>
+    </div>
+
+    <ul class="nav-list">
+
+      <li>
+        <a href="/">
+          <i class="fas fa-gauge-high"></i>
+          <span class="label">Dashboard</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="/analytics" class="active">
+          <i class="fas fa-arrow-trend-up"></i>
+          <span class="label">Analytics</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="/network">
+          <i class="fas fa-network-wired"></i>
+          <span class="label">Network</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="/access-request">
+          <i class="fas fa-key"></i>
+          <span class="label">Access Request</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="/alerts">
+          <i class="fas fa-bell"></i>
+          <span class="label">Alerts</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="/policies">
+          <i class="fas fa-sliders"></i>
+          <span class="label">Policies</span>
+        </a>
+      </li>
+
+    </ul>
+
+    <div class="sidebar-bottom">
+
+      <div class="avatar">
+        <a href="/profile" style="color:inherit;">
+          <i class="fas fa-user-astronaut"></i>
+        </a>
+      </div>
+
+    </div>
+
+  </aside>
+
+  <div class="main-wrapper">
+
+    <header class="top-bar">
+
+      <div class="status-left">
+
+        <div class="status-badge">
+          <span class="dot"></span>
+          System • Zero Trust
+        </div>
+
+        <div class="status-badge">
+          <i class="fas fa-check-circle" style="color:#3dd68c;"></i>
+          24/7
+        </div>
+
+        <div class="status-badge">
+          <i class="fas fa-user-shield"></i>
+          Zero Trust Policy
+        </div>
+
+      </div>
+
+      <div class="status-right">
+
+        <i class="fas fa-expand"></i>
+        <i class="fas fa-bell"></i>
+
+        <span class="time-display" id="liveTime">
+          --:-- UTC
+        </span>
+
+      </div>
+
+    </header>
+
+    <div class="dashboard">
+
+      <div style="margin-bottom:25px;">
+
+        <h2 style="margin-bottom:8px;">
+          Security Analytics
+        </h2>
+
+        <p style="color:#7f8da3;">
+          Monitor access requests and security risk trends.
+        </p>
+
+      </div>
+
+      <section class="cards-grid">
+
+        <div class="card card-users">
+
+          <div class="card-label">
+            <i class="fas fa-arrows-spin"></i>
+            Total Requests
+          </div>
+
+          <div class="card-value">
+            {{ total_requests }}
+          </div>
+
+          <div class="card-sub">
+            All access requests
+          </div>
+
+        </div>
+
+        <div class="card card-allowed">
+
+          <div class="card-label">
+            <i class="fas fa-check-circle"></i>
+            Allowed
+          </div>
+
+          <div class="card-value">
+            {{ allowed }}
+          </div>
+
+          <div class="card-sub">
+            Approved requests
+          </div>
+
+        </div>
+
+        <div class="card card-blocked">
+
+          <div class="card-label">
+            <i class="fas fa-ban"></i>
+            Blocked
+          </div>
+
+          <div class="card-value">
+            {{ blocked }}
+          </div>
+
+          <div class="card-sub">
+            Denied requests
+          </div>
+
+        </div>
+
+        <div class="card card-risk">
+
+          <div class="card-label">
+            <i class="fas fa-triangle-exclamation"></i>
+            Average Risk
+          </div>
+
+          <div class="card-value">
+            {{ avg_risk_score }}
+          </div>
+
+          <div class="card-sub">
+            Current average risk score
+          </div>
+
+        </div>
+
+      </section>
+
+      <section class="three-col" style="margin-top:25px;">
+
+        <div class="panel">
+
+          <div class="panel-header">
+
+            <h4>
+              <i class="fas fa-chart-pie"></i>
+              Request Decisions
+            </h4>
+
+          </div>
+
+          <div style="padding:25px;">
+
+            <div style="margin-bottom:20px;">
+
+              <div
+                style="
+                  display:flex;
+                  justify-content:space-between;
+                  margin-bottom:8px;
+                "
+              >
+
+                <span>Allowed</span>
+
+                <strong>{{ allowed }}</strong>
+
+              </div>
+
+              <div
+                style="
+                  height:8px;
+                  background:#1d2633;
+                  border-radius:10px;
+                  overflow:hidden;
+                "
+              >
+
+                <div
+                  id="allowedProgress"
+                  data-width="{{ allowed_percentage }}"
+                  style="
+                    height:100%;
+                    background:#3dd68c;
+                    border-radius:10px;
+                    width:0;
+                  "
+                ></div>
+
+              </div>
+
+              <div
+                style="
+                  margin-top:6px;
+                  font-size:12px;
+                  color:#7f8da3;
+                "
+              >
+                {{ allowed_percentage }}%
+              </div>
+
+            </div>
+
+            <div>
+
+              <div
+                style="
+                  display:flex;
+                  justify-content:space-between;
+                  margin-bottom:8px;
+                "
+              >
+
+                <span>Blocked</span>
+
+                <strong>{{ blocked }}</strong>
+
+              </div>
+
+              <div
+                style="
+                  height:8px;
+                  background:#1d2633;
+                  border-radius:10px;
+                  overflow:hidden;
+                "
+              >
+
+                <div
+                  id="blockedProgress"
+                  data-width="{{ blocked_percentage }}"
+                  style="
+                    height:100%;
+                    background:#f47b7b;
+                    border-radius:10px;
+                    width:0;
+                  "
+                ></div>
+
+              </div>
+
+              <div
+                style="
+                  margin-top:6px;
+                  font-size:12px;
+                  color:#7f8da3;
+                "
+              >
+                {{ blocked_percentage }}%
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="panel">
+
+          <div class="panel-header">
+
+            <h4>
+              <i class="fas fa-shield-halved"></i>
+              Risk Overview
+            </h4>
+
+          </div>
+
+          <div style="padding:25px;">
+
+            {% if avg_risk_score <= 30 %}
+
+              <div
+                style="
+                  font-size:28px;
+                  color:#3dd68c;
+                  margin-bottom:10px;
+                "
+              >
+                LOW
+              </div>
+
+              <p style="color:#7f8da3;">
+                Current average risk is low.
+              </p>
+
+            {% elif avg_risk_score <= 60 %}
+
+              <div
+                style="
+                  font-size:28px;
+                  color:#e8b45a;
+                  margin-bottom:10px;
+                "
+              >
+                MODERATE
+              </div>
+
+              <p style="color:#7f8da3;">
+                Current average risk requires monitoring.
+              </p>
+
+            {% else %}
+
+              <div
+                style="
+                  font-size:28px;
+                  color:#f47b7b;
+                  margin-bottom:10px;
+                "
+              >
+                HIGH
+              </div>
+
+              <p style="color:#7f8da3;">
+                Current average risk requires attention.
+              </p>
+
+            {% endif %}
+
+            <p style="margin-top:20px;">
+              Average Risk Score:
+              <strong>{{ avg_risk_score }}</strong>
+            </p>
+
+          </div>
+
+        </div>
+
+        <div class="panel">
+
+          <div class="panel-header">
+
+            <h4>
+              <i class="fas fa-clock-rotate-left"></i>
+              Recent Requests
+            </h4>
+
+          </div>
+
+          <div style="padding:20px;">
+
+            {% if recent_activity %}
+
+              {% for activity in recent_activity %}
+
+                <div
+                  style="
+                    padding:12px 0;
+                    border-bottom:1px solid #1d2633;
+                  "
+                >
+
+                  <strong>
+                    {{ activity[1] }}
+                  </strong>
+
+                  → {{ activity[0] }}
+
+                  <div
+                    style="
+                      color:#7f8da3;
+                      font-size:12px;
+                      margin-top:5px;
+                    "
+                  >
+
+                    Risk:
+                    {{ activity[2] }}
+                    ·
+                    {{ activity[3] }}
+
+                  </div>
+
+                </div>
+
+              {% endfor %}
+
+            {% else %}
+
+              <p style="color:#7f8da3;">
+                No requests available.
+              </p>
+
+            {% endif %}
+
+          </div>
+
+        </div>
+
+      </section>
+
+      <div
+        style="
+          margin-top:30px;
+          font-size:12px;
+          color:#3a4a62;
+          display:flex;
+          justify-content:flex-end;
+          border-top:1px solid #1d2633;
+          padding-top:16px;
+        "
+      >
+
+        <span>
+          <i class="fas fa-shield-halved"></i>
+          ZeroTrustX · Security Analytics
+        </span>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+
+    const allowedProgress =
+      document.getElementById("allowedProgress");
+
+    const blockedProgress =
+      document.getElementById("blockedProgress");
+
+    if (allowedProgress) {
+      allowedProgress.style.width =
+        allowedProgress.dataset.width + "%";
+    }
+
+    if (blockedProgress) {
+      blockedProgress.style.width =
+        blockedProgress.dataset.width + "%";
+    }
+
+  </script>
+
+  <script
+    src="{{ url_for('static', filename='js/dashboard.js') }}"
+  ></script>
+
+</body>
+
+</html>

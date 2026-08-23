@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>ZeroTrustX · Security Alerts</title>
+
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+  >
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  >
+
+  <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/style.css') }}"
+  >
+
+</head>
+
+<body>
+
+  <aside class="sidebar">
+
+    <div class="logo">
+      <i class="fas fa-shield-halved"></i>
+    </div>
+
+    <ul class="nav-list">
+
+      <li>
+        <a href="/">
+          <i class="fas fa-gauge-high"></i>
+          <span class="label">Dashboard</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="/analytics">
+          <i class="fas fa-arrow-trend-up"></i>
+          <span class="label">Analytics</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="/network">
+          <i class="fas fa-network-wired"></i>
+          <span class="label">Network</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="/access-request">
+          <i class="fas fa-key"></i>
+          <span class="label">Access Request</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="/alerts" class="active">
+          <i class="fas fa-bell"></i>
+          <span class="label">Alerts</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="/policies">
+          <i class="fas fa-sliders"></i>
+          <span class="label">Policies</span>
+        </a>
+      </li>
+
+    </ul>
+
+    <div class="sidebar-bottom">
+
+      <div class="avatar">
+
+        <a href="/profile" style="color:inherit;">
+
+          <i class="fas fa-user-astronaut"></i>
+
+        </a>
+
+      </div>
+
+    </div>
+
+  </aside>
+
+  <div class="main-wrapper">
+
+    <header class="top-bar">
+
+      <div class="status-left">
+
+        <div class="status-badge">
+
+          <span class="dot"></span>
+
+          System • Zero Trust
+
+        </div>
+
+        <div class="status-badge">
+
+          <i
+            class="fas fa-check-circle"
+            style="color:#3dd68c;"
+          ></i>
+
+          24/7
+
+        </div>
+
+        <div class="status-badge">
+
+          <i class="fas fa-user-shield"></i>
+
+          Zero Trust Policy
+
+        </div>
+
+      </div>
+
+      <div class="status-right">
+
+        <i class="fas fa-expand"></i>
+
+        <i class="fas fa-bell"></i>
+
+        <span
+          class="time-display"
+          id="liveTime"
+        >
+          --:-- UTC
+        </span>
+
+      </div>
+
+    </header>
+
+    <div class="dashboard">
+
+      <div style="margin-bottom:25px;">
+
+        <h2 style="margin-bottom:8px;">
+          Security Alerts
+        </h2>
+
+        <p style="color:#7f8da3;">
+          Monitor security events detected by ZeroTrustX.
+        </p>
+
+      </div>
+
+      <section class="cards-grid">
+
+        <div class="card card-blocked">
+
+          <div class="card-label">
+
+            <i class="fas fa-bell"></i>
+
+            Total Alerts
+
+          </div>
+
+          <div class="card-value">
+            {{ alerts|length }}
+          </div>
+
+          <div class="card-sub">
+            Security events
+          </div>
+
+        </div>
+
+        <div class="card card-risk">
+
+          <div class="card-label">
+
+            <i class="fas fa-circle-exclamation"></i>
+
+            Critical
+
+          </div>
+
+          <div class="card-value">
+            {{ critical_count }}
+          </div>
+
+          <div class="card-sub">
+            Immediate attention
+          </div>
+
+        </div>
+
+        <div class="card">
+
+          <div class="card-label">
+
+            <i class="fas fa-triangle-exclamation"></i>
+
+            Warning
+
+          </div>
+
+          <div class="card-value">
+            {{ warning_count }}
+          </div>
+
+          <div class="card-sub">
+            Requires monitoring
+          </div>
+
+        </div>
+
+        <div class="card card-allowed">
+
+          <div class="card-label">
+
+            <i class="fas fa-circle-info"></i>
+
+            Informational
+
+          </div>
+
+          <div class="card-value">
+            {{ info_count }}
+          </div>
+
+          <div class="card-sub">
+            Security information
+          </div>
+
+        </div>
+
+      </section>
+
+      <div
+        class="panel"
+        style="margin-top:25px;"
+      >
+
+        <div class="panel-header">
+
+          <h4>
+
+            <i class="fas fa-shield-halved"></i>
+
+            Active Security Alerts
+
+          </h4>
+
+          <span
+            class="more-link"
+            style="color:#f47b7b;"
+          >
+
+            {{ alerts|length }} alerts
+
+          </span>
+
+        </div>
+
+        <div class="alert-list">
+
+          {% if alerts %}
+
+            {% for alert in alerts %}
+
+            <div
+              class="
+                alert-item
+                {% if alert[2] == 'CRITICAL' %}
+                  critical
+                {% elif alert[2] == 'WARNING' %}
+                  warning
+                {% else %}
+                  info
+                {% endif %}
+              "
+              style="
+                padding:18px;
+                margin-bottom:8px;
+              "
+            >
+
+              <span class="alert-icon">
+
+                {% if alert[2] == 'CRITICAL' %}
+
+                  <i class="fas fa-circle-exclamation"></i>
+
+                {% elif alert[2] == 'WARNING' %}
+
+                  <i class="fas fa-triangle-exclamation"></i>
+
+                {% else %}
+
+                  <i class="fas fa-circle-info"></i>
+
+                {% endif %}
+
+              </span>
+
+              <span class="alert-text">
+
+                <strong>
+                  {{ alert[1] }}
+                </strong>
+
+                <span
+                  style="
+                    display:block;
+                    font-size:11px;
+                    margin-top:4px;
+                    color:#7f8da3;
+                  "
+                >
+
+                  Type: {{ alert[0] }}
+
+                </span>
+
+              </span>
+
+              <span
+                class="alert-time"
+                style="margin-left:auto;"
+              >
+
+                {{ alert[3].strftime('%H:%M') }}
+
+              </span>
+
+            </div>
+
+            {% endfor %}
+
+          {% else %}
+
+            <div
+              style="
+                padding:30px;
+                text-align:center;
+                color:#7f8da3;
+              "
+            >
+
+              <i
+                class="fas fa-shield-check"
+                style="
+                  font-size:35px;
+                  margin-bottom:12px;
+                  color:#3dd68c;
+                "
+              ></i>
+
+              <div>
+                No active security alerts
+              </div>
+
+            </div>
+
+          {% endif %}
+
+        </div>
+
+      </div>
+
+      <div
+        style="
+          margin-top:30px;
+          font-size:12px;
+          color:#3a4a62;
+          display:flex;
+          justify-content:flex-end;
+          border-top:1px solid #1d2633;
+          padding-top:16px;
+        "
+      >
+
+        <span>
+
+          <i class="fas fa-shield-halved"></i>
+
+          ZeroTrustX · Security Alerts
+
+        </span>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <script
+    src="{{ url_for('static', filename='js/dashboard.js') }}"
+  ></script>
+
+</body>
+
+</html>

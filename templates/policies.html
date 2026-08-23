@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>ZeroTrustX · Policies</title>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+    <style>
+
+        .policy-control {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            padding: 18px 5px;
+            border-bottom: 1px solid #1d2633;
+        }
+
+        .policy-control:last-child {
+            border-bottom: none;
+        }
+
+        .policy-control-icon {
+            font-size: 22px;
+            width: 35px;
+            text-align: center;
+        }
+
+        .policy-control-content {
+            flex: 1;
+        }
+
+        .policy-control-title {
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .policy-control-description {
+            color: #7f8da3;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .switch {
+            position: relative;
+            width: 48px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background: #354255;
+            border-radius: 30px;
+            transition: 0.2s;
+        }
+
+        .slider:before {
+            content: "";
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            left: 3px;
+            top: 3px;
+            background: #ffffff;
+            border-radius: 50%;
+            transition: 0.2s;
+        }
+
+        .switch input:checked + .slider {
+            background: #00c8b6;
+        }
+
+        .switch input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+
+        .policy-status {
+            font-size: 11px;
+            font-weight: 700;
+            width: 55px;
+            text-align: right;
+        }
+
+        .status-on {
+            color: #3dd68c;
+        }
+
+        .status-off {
+            color: #f47b7b;
+        }
+
+        .decision-flow {
+            padding: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            text-align: center;
+        }
+
+        .decision-step {
+            padding: 18px;
+            border: 1px solid #2a3f55;
+            border-radius: 10px;
+            background: #101a26;
+            color: #ffffff;
+            min-width: 130px;
+        }
+
+        .decision-arrow {
+            color: #7f8da3;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .save-message {
+            margin: 15px 0 0;
+            padding: 12px 15px;
+            border-radius: 8px;
+            background: #123329;
+            border: 1px solid #3dd68c;
+            color: #3dd68c;
+            font-size: 13px;
+        }
+
+        @media (max-width: 700px) {
+
+            .policy-control {
+                gap: 10px;
+            }
+
+            .policy-control-description {
+                font-size: 11px;
+            }
+
+            .policy-status {
+                display: none;
+            }
+
+            .decision-flow {
+                flex-direction: column;
+            }
+
+            .decision-arrow {
+                transform: rotate(90deg);
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            <i class="fas fa-shield-halved"></i>
+        </div>
+
+        <ul class="nav-list">
+
+            <!-- 1. DASHBOARD -->
+            <li>
+                <a href="/">
+                    <i class="fas fa-gauge-high"></i>
+                    <span class="label">
+                        Dashboard
+                    </span>
+                </a>
+            </li>
+
+            <!-- 2. ANALYTICS -->
+            <li>
+                <a href="/analytics">
+                    <i class="fas fa-arrow-trend-up"></i>
+                    <span class="label">
+                        Analytics
+                    </span>
+                </a>
+            </li>
+
+            <!-- 3. NETWORK -->
+            <li>
+                <a href="/network">
+                    <i class="fas fa-network-wired"></i>
+                    <span class="label">
+                        Network
+                    </span>
+                </a>
+            </li>
+
+            <!-- 4. ACCESS REQUEST -->
+            <li>
+                <a href="/access-request">
+                    <i class="fas fa-key"></i>
+                    <span class="label">
+                        Access Request
+                    </span>
+                </a>
+            </li>
+
+            <!-- 5. ALERTS -->
+            <li>
+                <a href="/alerts">
+                    <i class="fas fa-bell"></i>
+                    <span class="label">
+                        Alerts
+                    </span>
+                </a>
+            </li>
+
+            <!-- 6. POLICIES -->
+            <li>
+                <a href="/policies" class="active">
+                    <i class="fas fa-sliders"></i>
+                    <span class="label">
+                        Policies
+                    </span>
+                </a>
+            </li>
+
+        </ul>
+
+        <div class="sidebar-bottom">
+
+            <div class="avatar">
+
+                <a
+                    href="/profile"
+                    style="color:inherit;"
+                >
+                    <i class="fas fa-user-astronaut"></i>
+                </a>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <div class="main-wrapper">
+
+        <header class="top-bar">
+
+            <div class="status-left">
+
+                <div class="status-badge">
+                    <span class="dot"></span>
+                    System • Zero Trust
+                </div>
+
+                <div class="status-badge">
+                    <i
+                        class="fas fa-check-circle"
+                        style="color:#3dd68c;"
+                    ></i>
+                    24/7
+                </div>
+
+                <div class="status-badge">
+                    <i class="fas fa-user-shield"></i>
+                    Zero Trust Policy
+                </div>
+
+            </div>
+
+            <div class="status-right">
+
+                <i class="fas fa-expand"></i>
+
+                <i class="fas fa-bell"></i>
+
+                <span
+                    class="time-display"
+                    id="liveTime"
+                >
+                    --:-- UTC
+                </span>
+
+            </div>
+
+        </header>
+
+
+        <div class="dashboard">
+
+            <div style="margin-bottom:25px;">
+
+                <h2 style="margin-bottom:8px;">
+                    Zero Trust Policies
+                </h2>
+
+                <p style="color:#7f8da3;">
+                    Security rules used to verify every access request.
+                </p>
+
+            </div>
+
+
+            <section class="cards-grid">
+
+                <div class="card card-allowed">
+
+                    <div class="card-label">
+                        <i class="fas fa-shield-check"></i>
+                        Policy Status
+                    </div>
+
+                    <div
+                        class="card-value"
+                        style="font-size:22px;"
+                    >
+                        Active
+                    </div>
+
+                    <div class="card-sub">
+                        Policy engine connected to MySQL
+                    </div>
+
+                </div>
+
+
+                <div class="card card-users">
+
+                    <div class="card-label">
+                        <i class="fas fa-user-shield"></i>
+                        Authentication
+                    </div>
+
+                    <div
+                        class="card-value"
+                        style="font-size:22px;"
+                    >
+
+                        {% if policies["Multi-Factor Authentication"] %}
+                            MFA
+                        {% else %}
+                            Standard
+                        {% endif %}
+
+                    </div>
+
+                    <div class="card-sub">
+                        Multi-factor verification
+                    </div>
+
+                </div>
+
+
+                <div class="card card-risk">
+
+                    <div class="card-label">
+                        <i class="fas fa-gauge-high"></i>
+                        Risk Evaluation
+                    </div>
+
+                    <div
+                        class="card-value"
+                        style="font-size:22px;"
+                    >
+
+                        {% if policies["Risk-Based Access Control"] %}
+                            Enabled
+                        {% else %}
+                            Disabled
+                        {% endif %}
+
+                    </div>
+
+                    <div class="card-sub">
+                        Every request receives a risk score
+                    </div>
+
+                </div>
+
+
+                <div class="card card-blocked">
+
+                    <div class="card-label">
+                        <i class="fas fa-ban"></i>
+                        Default Trust
+                    </div>
+
+                    <div
+                        class="card-value"
+                        style="font-size:22px;"
+                    >
+                        DENY
+                    </div>
+
+                    <div class="card-sub">
+                        Access must be verified
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <div
+                class="panel"
+                style="margin-top:25px;"
+            >
+
+                <div class="panel-header">
+
+                    <h4>
+                        <i class="fas fa-list-check"></i>
+                        Active Zero Trust Rules
+                    </h4>
+
+                    <span
+                        class="more-link"
+                        style="color:#3dd68c;"
+                    >
+                        DATABASE CONTROLLED
+                    </span>
+
+                </div>
+
+
+                <div style="padding:10px 20px 20px;">
+
+                    <div class="policy-control">
+
+                        <i
+                            class="fas fa-shield-halved policy-control-icon"
+                            style="color:#00c8b6;"
+                        ></i>
+
+                        <div class="policy-control-content">
+
+                            <div class="policy-control-title">
+                                Never Trust, Always Verify
+                            </div>
+
+                            <div class="policy-control-description">
+                                Every access request must be verified before access.
+                            </div>
+
+                        </div>
+
+                        <span class="policy-status status-on">
+                            ENABLED
+                        </span>
+
+                    </div>
+
+
+                    <div class="policy-control">
+
+                        <i
+                            class="fas fa-mobile-screen-button policy-control-icon"
+                            style="color:#e8b45a;"
+                        ></i>
+
+                        <div class="policy-control-content">
+
+                            <div class="policy-control-title">
+                                Multi-Factor Authentication
+                            </div>
+
+                            <div class="policy-control-description">
+                                Sensitive resources require MFA verification.
+                            </div>
+
+                        </div>
+
+                        <span
+                            class="policy-status
+                            {% if policies['Multi-Factor Authentication'] %}
+                                status-on
+                            {% else %}
+                                status-off
+                            {% endif %}"
+                        >
+
+                            {% if policies["Multi-Factor Authentication"] %}
+                                ENABLED
+                            {% else %}
+                                DISABLED
+                            {% endif %}
+
+                        </span>
+
+                    </div>
+
+
+                    <div class="policy-control">
+
+                        <i
+                            class="fas fa-gauge-high policy-control-icon"
+                            style="color:#3dd68c;"
+                        ></i>
+
+                        <div class="policy-control-content">
+
+                            <div class="policy-control-title">
+                                Risk-Based Access Control
+                            </div>
+
+                            <div class="policy-control-description">
+                                Access decisions are based on calculated risk scores.
+                            </div>
+
+                        </div>
+
+                        <span
+                            class="policy-status
+                            {% if policies['Risk-Based Access Control'] %}
+                                status-on
+                            {% else %}
+                                status-off
+                            {% endif %}"
+                        >
+
+                            {% if policies["Risk-Based Access Control"] %}
+                                ENABLED
+                            {% else %}
+                                DISABLED
+                            {% endif %}
+
+                        </span>
+
+                    </div>
+
+
+                    <div class="policy-control">
+
+                        <i
+                            class="fas fa-user-lock policy-control-icon"
+                            style="color:#f47b7b;"
+                        ></i>
+
+                        <div class="policy-control-content">
+
+                            <div class="policy-control-title">
+                                High-Risk Access Blocking
+                            </div>
+
+                            <div class="policy-control-description">
+                                Requests with excessive risk are automatically denied.
+                            </div>
+
+                        </div>
+
+                        <span
+                            class="policy-status
+                            {% if policies['High-Risk Access Blocking'] %}
+                                status-on
+                            {% else %}
+                                status-off
+                            {% endif %}"
+                        >
+
+                            {% if policies["High-Risk Access Blocking"] %}
+                                ENABLED
+                            {% else %}
+                                DISABLED
+                            {% endif %}
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="panel"
+                style="margin-top:25px;"
+            >
+
+                <div class="panel-header">
+
+                    <h4>
+                        <i class="fas fa-sliders"></i>
+                        Policy Controls
+                    </h4>
+
+                    <span
+                        class="more-link"
+                        style="color:#3dd68c;"
+                    >
+                        SYSTEM ACTIVE
+                    </span>
+
+                </div>
+
+
+                <div style="padding:10px 20px 20px;">
+
+                    <form
+                        action="/policies/update"
+                        method="POST"
+                    >
+
+                        <div class="policy-control">
+
+                            <i
+                                class="fas fa-mobile-screen-button policy-control-icon"
+                                style="color:#e8b45a;"
+                            ></i>
+
+                            <div class="policy-control-content">
+
+                                <div class="policy-control-title">
+                                    Multi-Factor Authentication
+                                </div>
+
+                                <div class="policy-control-description">
+                                    Require additional verification for sensitive resources.
+                                </div>
+
+                            </div>
+
+                            <span
+                                class="policy-status
+                                {% if policies['Multi-Factor Authentication'] %}
+                                    status-on
+                                {% else %}
+                                    status-off
+                                {% endif %}"
+                            >
+
+                                {% if policies["Multi-Factor Authentication"] %}
+                                    ON
+                                {% else %}
+                                    OFF
+                                {% endif %}
+
+                            </span>
+
+                            <label class="switch">
+
+                                <input
+                                    type="checkbox"
+                                    name="mfa"
+                                    value="1"
+                                    {% if policies["Multi-Factor Authentication"] %}checked{% endif %}
+                                >
+
+                                <span class="slider"></span>
+
+                            </label>
+
+                        </div>
+
+
+                        <div class="policy-control">
+
+                            <i
+                                class="fas fa-gauge-high policy-control-icon"
+                                style="color:#3dd68c;"
+                            ></i>
+
+                            <div class="policy-control-content">
+
+                                <div class="policy-control-title">
+                                    Risk-Based Access Control
+                                </div>
+
+                                <div class="policy-control-description">
+                                    Evaluate every request using its calculated risk score.
+                                </div>
+
+                            </div>
+
+                            <span
+                                class="policy-status
+                                {% if policies['Risk-Based Access Control'] %}
+                                    status-on
+                                {% else %}
+                                    status-off
+                                {% endif %}"
+                            >
+
+                                {% if policies["Risk-Based Access Control"] %}
+                                    ON
+                                {% else %}
+                                    OFF
+                                {% endif %}
+
+                            </span>
+
+                            <label class="switch">
+
+                                <input
+                                    type="checkbox"
+                                    name="risk"
+                                    value="1"
+                                    {% if policies["Risk-Based Access Control"] %}checked{% endif %}
+                                >
+
+                                <span class="slider"></span>
+
+                            </label>
+
+                        </div>
+
+
+                        <div class="policy-control">
+
+                            <i
+                                class="fas fa-user-lock policy-control-icon"
+                                style="color:#f47b7b;"
+                            ></i>
+
+                            <div class="policy-control-content">
+
+                                <div class="policy-control-title">
+                                    High-Risk Access Blocking
+                                </div>
+
+                                <div class="policy-control-description">
+                                    Automatically block requests above the risk threshold.
+                                </div>
+
+                            </div>
+
+                            <span
+                                class="policy-status
+                                {% if policies['High-Risk Access Blocking'] %}
+                                    status-on
+                                {% else %}
+                                    status-off
+                                {% endif %}"
+                            >
+
+                                {% if policies["High-Risk Access Blocking"] %}
+                                    ON
+                                {% else %}
+                                    OFF
+                                {% endif %}
+
+                            </span>
+
+                            <label class="switch">
+
+                                <input
+                                    type="checkbox"
+                                    name="high_risk"
+                                    value="1"
+                                    {% if policies["High-Risk Access Blocking"] %}checked{% endif %}
+                                >
+
+                                <span class="slider"></span>
+
+                            </label>
+
+                        </div>
+
+
+                        <div class="policy-control">
+
+                            <i
+                                class="fas fa-arrows-rotate policy-control-icon"
+                                style="color:#5b8cdf;"
+                            ></i>
+
+                            <div class="policy-control-content">
+
+                                <div class="policy-control-title">
+                                    Continuous Verification
+                                </div>
+
+                                <div class="policy-control-description">
+                                    Continuously verify identity and access conditions.
+                                </div>
+
+                            </div>
+
+                            <span
+                                class="policy-status
+                                {% if policies['Continuous Verification'] %}
+                                    status-on
+                                {% else %}
+                                    status-off
+                                {% endif %}"
+                            >
+
+                                {% if policies["Continuous Verification"] %}
+                                    ON
+                                {% else %}
+                                    OFF
+                                {% endif %}
+
+                            </span>
+
+                            <label class="switch">
+
+                                <input
+                                    type="checkbox"
+                                    name="continuous"
+                                    value="1"
+                                    {% if policies["Continuous Verification"] %}checked{% endif %}
+                                >
+
+                                <span class="slider"></span>
+
+                            </label>
+
+                        </div>
+
+
+                        <button
+                            type="submit"
+                            style="
+                                margin-top:20px;
+                                padding:12px 22px;
+                                border:none;
+                                border-radius:8px;
+                                background:#00c8b6;
+                                color:#ffffff;
+                                font-weight:600;
+                                cursor:pointer;
+                            "
+                        >
+
+                            <i class="fas fa-save"></i>
+
+                            Save Policy Settings
+
+                        </button>
+
+                    </form>
+
+
+                    {% if saved %}
+
+                    <div class="save-message">
+
+                        <i class="fas fa-check-circle"></i>
+
+                        Policy settings saved successfully.
+
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="panel"
+                style="margin-top:25px;"
+            >
+
+                <div class="panel-header">
+
+                    <h4>
+                        <i class="fas fa-code-branch"></i>
+                        Access Decision Logic
+                    </h4>
+
+                </div>
+
+
+                <div class="decision-flow">
+
+                    <div class="decision-step">
+                        Access Request
+                    </div>
+
+                    <span class="decision-arrow">
+                        →
+                    </span>
+
+                    <div class="decision-step">
+                        Verify Identity
+                    </div>
+
+                    <span class="decision-arrow">
+                        →
+                    </span>
+
+                    <div class="decision-step">
+                        Calculate Risk
+                    </div>
+
+                    <span class="decision-arrow">
+                        →
+                    </span>
+
+                    <div class="decision-step">
+                        Allow / Block
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div
+                style="
+                    margin-top:30px;
+                    font-size:12px;
+                    color:#3a4a62;
+                    display:flex;
+                    justify-content:flex-end;
+                    border-top:1px solid #1d2633;
+                    padding-top:16px;
+                "
+            >
+
+                <span>
+
+                    <i class="fas fa-shield-halved"></i>
+
+                    ZeroTrustX · Zero Trust Policies
+
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script
+        src="{{ url_for('static', filename='js/dashboard.js') }}"
+    ></script>
+
+</body>
+
+</html>

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>ZeroTrustX · Profile</title>
+
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+  >
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  >
+
+  <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/style.css') }}"
+  >
+</head>
+
+<body>
+
+  <aside class="sidebar">
+
+    <div class="logo">
+      <i class="fas fa-shield-halved"></i>
+    </div>
+
+    <ul class="nav-list">
+
+      <li>
+        <a href="/">
+          <i class="fas fa-gauge-high"></i>
+          <span class="label">Dashboard</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="/analytics">
+          <i class="fas fa-arrow-trend-up"></i>
+          <span class="label">Analytics</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="/network">
+          <i class="fas fa-network-wired"></i>
+          <span class="label">Network</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="/access-request">
+          <i class="fas fa-key"></i>
+          <span class="label">Access Request</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="/alerts">
+          <i class="fas fa-bell"></i>
+          <span class="label">Alerts</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="/policies">
+          <i class="fas fa-sliders"></i>
+          <span class="label">Policies</span>
+        </a>
+      </li>
+
+    </ul>
+
+    <div class="sidebar-bottom">
+
+      <a
+        href="/profile"
+        class="avatar"
+        title="Admin Profile"
+      >
+        <i class="fas fa-user-astronaut"></i>
+      </a>
+
+    </div>
+
+  </aside>
+
+
+  <div class="main-wrapper">
+
+    <header class="top-bar">
+
+      <div class="status-left">
+
+        <div class="status-badge">
+          <span class="dot"></span>
+          System • Zero Trust
+        </div>
+
+        <div class="status-badge">
+          <i
+            class="fas fa-check-circle"
+            style="color:#3dd68c;"
+          ></i>
+          24/7
+        </div>
+
+        <div class="status-badge">
+          <i class="fas fa-user-shield"></i>
+          Zero Trust Policy
+        </div>
+
+      </div>
+
+      <div class="status-right">
+
+        <i class="fas fa-expand"></i>
+
+        <i class="fas fa-bell"></i>
+
+        <span
+          class="time-display"
+          id="liveTime"
+        >
+          --:-- UTC
+        </span>
+
+      </div>
+
+    </header>
+
+
+    <div class="dashboard">
+
+      <div style="margin-bottom:25px;">
+
+        <h2 style="margin-bottom:8px;">
+          User Profile
+        </h2>
+
+        <p style="color:#7f8da3;">
+          View the current ZeroTrustX administrator security profile.
+        </p>
+
+      </div>
+
+
+      <div
+        class="panel"
+        style="
+          max-width:700px;
+          margin:0 auto;
+        "
+      >
+
+        <div
+          style="
+            text-align:center;
+            padding:25px 20px 10px;
+          "
+        >
+
+          <div
+            style="
+              width:80px;
+              height:80px;
+              margin:0 auto 15px;
+              border-radius:50%;
+              display:flex;
+              align-items:center;
+              justify-content:center;
+              background:#162536;
+              border:1px solid #2a3f55;
+              font-size:32px;
+              color:#00c8b6;
+            "
+          >
+            <i class="fas fa-user-astronaut"></i>
+          </div>
+
+          <h2 style="margin-bottom:6px;">
+            {{ username }}
+          </h2>
+
+          <p style="color:#7f8da3;">
+            {{ role }}
+          </p>
+
+        </div>
+
+
+        <div style="padding:20px;">
+
+          <div
+            style="
+              display:flex;
+              justify-content:space-between;
+              align-items:center;
+              padding:18px;
+              margin-bottom:10px;
+              background:#101a26;
+              border:1px solid #1d2b3a;
+              border-radius:8px;
+            "
+          >
+
+            <span>
+              <i class="fas fa-user-shield"></i>
+              Role
+            </span>
+
+            <strong>
+              {{ role }}
+            </strong>
+
+          </div>
+
+
+          <div
+            style="
+              display:flex;
+              justify-content:space-between;
+              align-items:center;
+              padding:18px;
+              margin-bottom:10px;
+              background:#101a26;
+              border:1px solid #1d2b3a;
+              border-radius:8px;
+            "
+          >
+
+            <span>
+              <i class="fas fa-mobile-screen-button"></i>
+              Multi-Factor Authentication
+            </span>
+
+            {% if mfa_enabled %}
+
+              <strong style="color:#3dd68c;">
+                <i class="fas fa-check-circle"></i>
+                Enabled
+              </strong>
+
+            {% else %}
+
+              <strong style="color:#f47b7b;">
+                <i class="fas fa-circle-xmark"></i>
+                Disabled
+              </strong>
+
+            {% endif %}
+
+          </div>
+
+
+          <div
+            style="
+              display:flex;
+              justify-content:space-between;
+              align-items:center;
+              padding:18px;
+              margin-bottom:10px;
+              background:#101a26;
+              border:1px solid #1d2b3a;
+              border-radius:8px;
+            "
+          >
+
+            <span>
+              <i class="fas fa-laptop"></i>
+              Device Trust
+            </span>
+
+            {% if device_trusted %}
+
+              <strong style="color:#3dd68c;">
+                <i class="fas fa-check-circle"></i>
+                Trusted
+              </strong>
+
+            {% else %}
+
+              <strong style="color:#f47b7b;">
+                <i class="fas fa-circle-xmark"></i>
+                Untrusted
+              </strong>
+
+            {% endif %}
+
+          </div>
+
+
+          <div
+            style="
+              display:flex;
+              justify-content:space-between;
+              align-items:center;
+              padding:18px;
+              background:#101a26;
+              border:1px solid #1d2b3a;
+              border-radius:8px;
+            "
+          >
+
+            <span>
+              <i class="fas fa-shield-halved"></i>
+              Zero Trust Status
+            </span>
+
+            <strong style="color:#3dd68c;">
+              <i class="fas fa-circle-check"></i>
+              Active
+            </strong>
+
+          </div>
+
+        </div>
+
+
+        <div
+          style="
+            padding:0 20px 25px;
+            text-align:center;
+          "
+        >
+
+          <a
+            href="/"
+            class="more-link"
+            style="text-decoration:none;"
+          >
+            <i class="fas fa-arrow-left"></i>
+            Back to Dashboard
+          </a>
+
+        </div>
+
+      </div>
+
+
+      <div
+        style="
+          margin-top:30px;
+          font-size:12px;
+          color:#3a4a62;
+          display:flex;
+          justify-content:flex-end;
+          border-top:1px solid #1d2633;
+          padding-top:16px;
+        "
+      >
+
+        <span>
+          <i class="fas fa-shield-halved"></i>
+          ZeroTrustX · User Profile
+        </span>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <script
+    src="{{ url_for('static', filename='js/dashboard.js') }}"
+  ></script>
+
+</body>
+
+</html>

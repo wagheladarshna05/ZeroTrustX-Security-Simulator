@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>ZeroTrustX · Access Request</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+    <div
+        style="
+            max-width:600px;
+            margin:80px auto;
+            padding:30px;
+            background:#101a26;
+            border:1px solid #2a3f55;
+            border-radius:12px;
+            color:white;
+        "
+    >
+
+        {% if decision is defined %}
+
+            <h2>
+                🔐 Access Request Result
+            </h2>
+
+
+            <div
+                style="
+                    margin-top:25px;
+                    padding:20px;
+                    border-radius:8px;
+                    background:#172333;
+                "
+            >
+
+                <h2
+                    {% if decision == 'ALLOW' %}
+                        style="color:#3dd68c;"
+                    {% else %}
+                        style="color:#f47b7b;"
+                    {% endif %}
+                >
+
+                    {{ decision }}
+
+                </h2>
+
+
+                <p>
+
+                    <strong>
+                        Risk Score:
+                    </strong>
+
+                    {{ risk_score }}
+
+                </p>
+
+
+                <p>
+
+                    <strong>
+                        Reason:
+                    </strong>
+
+                    {{ reason }}
+
+                </p>
+
+            </div>
+
+
+            <br>
+
+
+            <a
+                href="/"
+                style="color:#00c8b6;"
+            >
+
+                ← Back to Dashboard
+
+            </a>
+
+
+            <br>
+            <br>
+
+
+            <a
+                href="/access-request"
+                style="color:#00c8b6;"
+            >
+
+                Request Another Access
+
+            </a>
+
+
+        {% else %}
+
+
+            <h2>
+                🔐 Zero Trust Access Request
+            </h2>
+
+
+            <p style="color:#9aa9bc;">
+
+                Request access to an enterprise resource.
+
+            </p>
+
+
+            {% if error %}
+
+                <div
+                    style="
+                        padding:12px;
+                        margin-bottom:20px;
+                        background:#3a1f25;
+                        border:1px solid #f47b7b;
+                        border-radius:6px;
+                        color:#f47b7b;
+                    "
+                >
+
+                    {{ error }}
+
+                </div>
+
+            {% endif %}
+
+
+            <form
+                method="POST"
+                action="/access-request"
+            >
+
+
+                <label>
+                    Username
+                </label>
+
+
+                <input
+                    type="text"
+                    name="username"
+                    placeholder="admin"
+                    required
+                    style="
+                        width:100%;
+                        padding:12px;
+                        margin:8px 0 20px;
+                        box-sizing:border-box;
+                    "
+                >
+
+
+                <label>
+                    Resource
+                </label>
+
+
+                <select
+                    name="resource"
+                    required
+                    style="
+                        width:100%;
+                        padding:12px;
+                        margin:8px 0 20px;
+                    "
+                >
+
+                    <option value="Customer Database">
+                        Customer Database
+                    </option>
+
+                    <option value="Employee Records">
+                        Employee Records
+                    </option>
+
+                    <option value="Financial System">
+                        Financial System
+                    </option>
+
+                    <option value="Internal API">
+                        Internal API
+                    </option>
+
+                </select>
+
+
+                <label>
+                    Action
+                </label>
+
+
+                <select
+                    name="action"
+                    required
+                    style="
+                        width:100%;
+                        padding:12px;
+                        margin:8px 0 20px;
+                    "
+                >
+
+                    <option value="READ">
+                        READ
+                    </option>
+
+                    <option value="WRITE">
+                        WRITE
+                    </option>
+
+                    <option value="DELETE">
+                        DELETE
+                    </option>
+
+                </select>
+
+
+                <button
+                    type="submit"
+                    style="
+                        width:100%;
+                        padding:13px;
+                        background:#00c8b6;
+                        color:white;
+                        border:none;
+                        border-radius:6px;
+                        cursor:pointer;
+                        font-weight:bold;
+                    "
+                >
+
+                    Request Access
+
+                </button>
+
+
+            </form>
+
+
+            <br>
+
+
+            <a
+                href="/"
+                style="color:#00c8b6;"
+            >
+
+                ← Back to Dashboard
+
+            </a>
+
+
+        {% endif %}
+
+
+    </div>
+
+
+</body>
+
+</html>

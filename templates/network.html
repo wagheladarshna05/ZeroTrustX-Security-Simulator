@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>ZeroTrustX · Network</title>
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <style>
+
+        html,
+        body {
+            min-height: 100%;
+            margin: 0;
+        }
+
+        body {
+            overflow-y: auto;
+        }
+
+        .network-page {
+            padding: 30px;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            color: #9aa9bc;
+            margin-bottom: 28px;
+        }
+
+        .network-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+
+        .network-card {
+            background: #101a26;
+            border: 1px solid #2a3f55;
+            border-radius: 12px;
+            padding: 22px;
+        }
+
+        .network-card-title {
+            color: #9aa9bc;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .network-card-value {
+            color: #ffffff;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .network-panel {
+            background: #101a26;
+            border: 1px solid #2a3f55;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .network-panel h3 {
+            color: #ffffff;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .allow {
+            color: #3dd68c;
+        }
+
+        .deny {
+            color: #f47b7b;
+        }
+
+        .verify {
+            color: #e8b45a;
+        }
+
+        .latest-request {
+            background: #172333;
+            border-radius: 10px;
+            padding: 22px;
+        }
+
+        .request-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .request-item {
+            padding: 14px;
+            background: #101a26;
+            border-radius: 8px;
+        }
+
+        .request-label {
+            color: #7f91a7;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .request-value {
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .decision {
+            font-weight: 700;
+        }
+
+        .trust-flow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            padding: 10px 0 20px;
+        }
+
+        .trust-node {
+            width: min(320px, 90%);
+            box-sizing: border-box;
+            padding: 16px 20px;
+            background: #172333;
+            border: 1px solid #2a3f55;
+            border-radius: 10px;
+            text-align: center;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .trust-arrow {
+            color: #66788f;
+            font-size: 24px;
+            line-height: 1;
+            padding: 8px 0;
+        }
+
+        .trust-decision {
+            width: min(320px, 90%);
+            box-sizing: border-box;
+            padding: 16px 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .trust-decision.allow-box {
+            background: #123329;
+            border: 1px solid #3dd68c;
+            color: #3dd68c;
+        }
+
+        .trust-decision.block-box {
+            background: #3a1f25;
+            border: 1px solid #f47b7b;
+            color: #f47b7b;
+        }
+
+        .trust-decision.verify-box {
+            background: #332b1d;
+            border: 1px solid #e8b45a;
+            color: #e8b45a;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 10px;
+            margin-bottom: 30px;
+            color: #00c8b6;
+            text-decoration: none;
+        }
+
+        @media (max-width: 900px) {
+
+            .network-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+        }
+
+        @media (max-width: 600px) {
+
+            .network-page {
+                padding: 20px;
+            }
+
+            .network-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .request-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <aside class="sidebar">
+
+        <div class="logo">
+
+            <i class="fas fa-shield-halved"></i>
+
+        </div>
+
+
+        <ul class="nav-list">
+
+
+            <li>
+
+                <a href="/">
+
+                    <i class="fas fa-gauge-high"></i>
+
+                    <span class="label">
+                        Dashboard
+                    </span>
+
+                </a>
+
+            </li>
+
+
+            <li>
+
+                <a href="/analytics">
+
+                    <i class="fas fa-arrow-trend-up"></i>
+
+                    <span class="label">
+                        Analytics
+                    </span>
+
+                </a>
+
+            </li>
+
+
+            <li>
+
+                <a href="/network" class="active">
+
+                    <i class="fas fa-network-wired"></i>
+
+                    <span class="label">
+                        Network
+                    </span>
+
+                </a>
+
+            </li>
+
+
+            <li>
+
+                <a href="/access-request">
+
+                    <i class="fas fa-key"></i>
+
+                    <span class="label">
+                        Access Request
+                    </span>
+
+                </a>
+
+            </li>
+
+
+            <li>
+
+                <a href="/alerts">
+
+                    <i class="fas fa-bell"></i>
+
+                    <span class="label">
+                        Alerts
+                    </span>
+
+                </a>
+
+            </li>
+
+
+            <li>
+
+                <a href="/policies">
+
+                    <i class="fas fa-sliders"></i>
+
+                    <span class="label">
+                        Policies
+                    </span>
+
+                </a>
+
+            </li>
+
+
+        </ul>
+
+
+        <div class="sidebar-bottom">
+
+            <div class="avatar">
+
+                <a href="/profile" style="color:inherit;">
+
+                    <i class="fas fa-user-astronaut"></i>
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+    </aside>
+
+
+    <div class="main-wrapper">
+
+
+        <div class="network-page">
+
+
+            <div class="page-title">
+
+                Zero Trust Network
+
+            </div>
+
+
+            <div class="page-subtitle">
+
+                Monitor connected resources and trust decisions.
+
+            </div>
+
+
+            <div class="network-cards">
+
+
+                <div class="network-card">
+
+                    <div class="network-card-title">
+                        Users
+                    </div>
+
+                    <div class="network-card-value">
+                        {{ total_users }}
+                    </div>
+
+                </div>
+
+
+                <div class="network-card">
+
+                    <div class="network-card-title">
+                        Allowed
+                    </div>
+
+                    <div class="network-card-value allow">
+                        {{ allowed }}
+                    </div>
+
+                </div>
+
+
+                <div class="network-card">
+
+                    <div class="network-card-title">
+                        Blocked
+                    </div>
+
+                    <div class="network-card-value deny">
+                        {{ blocked }}
+                    </div>
+
+                </div>
+
+
+                <div class="network-card">
+
+                    <div class="network-card-title">
+                        Risk Score
+                    </div>
+
+                    <div class="network-card-value">
+                        {{ avg_risk_score }}
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+            <div class="network-panel">
+
+
+                <h3>
+                    Latest Access Decision
+                </h3>
+
+
+                {% if latest_request %}
+
+
+                    <div class="latest-request">
+
+
+                        <div class="request-grid">
+
+
+                            <div class="request-item">
+
+                                <div class="request-label">
+                                    User
+                                </div>
+
+                                <div class="request-value">
+                                    {{ latest_request[1] }}
+                                </div>
+
+                            </div>
+
+
+                            <div class="request-item">
+
+                                <div class="request-label">
+                                    Role
+                                </div>
+
+                                <div class="request-value">
+                                    {{ latest_request[2] }}
+                                </div>
+
+                            </div>
+
+
+                            <div class="request-item">
+
+                                <div class="request-label">
+                                    Resource
+                                </div>
+
+                                <div class="request-value">
+                                    {{ latest_request[3] }}
+                                </div>
+
+                            </div>
+
+
+                            <div class="request-item">
+
+                                <div class="request-label">
+                                    Action
+                                </div>
+
+                                <div class="request-value">
+                                    {{ latest_request[4] }}
+                                </div>
+
+                            </div>
+
+
+                            <div class="request-item">
+
+                                <div class="request-label">
+                                    Risk Score
+                                </div>
+
+                                <div class="request-value">
+                                    {{ latest_request[5] }}
+                                </div>
+
+                            </div>
+
+
+                            <div class="request-item">
+
+                                <div class="request-label">
+                                    Decision
+                                </div>
+
+                                <div
+                                    class="decision
+                                    {% if latest_request[6] == 'ALLOW' %}
+                                        allow
+                                    {% else %}
+                                        deny
+                                    {% endif %}"
+                                >
+
+                                    {{ latest_request[6] }}
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="request-item">
+
+                                <div class="request-label">
+                                    Reason
+                                </div>
+
+                                <div class="request-value">
+                                    {{ latest_request[7] }}
+                                </div>
+
+                            </div>
+
+
+                        </div>
+
+
+                    </div>
+
+
+                {% else %}
+
+
+                    <div class="latest-request">
+
+                        No access requests available yet.
+
+                    </div>
+
+
+                {% endif %}
+
+
+            </div>
+
+
+            <div class="network-panel">
+
+
+                <h3>
+                    Network Trust Flow
+                </h3>
+
+
+                <div class="trust-flow">
+
+
+                    <div class="trust-node">
+
+                        👤 User
+
+                    </div>
+
+
+                    <div class="trust-arrow">
+
+                        ↓
+
+                    </div>
+
+
+                    <div class="trust-node">
+
+                        🛡 Policy
+
+                    </div>
+
+
+                    <div class="trust-arrow">
+
+                        ↓
+
+                    </div>
+
+
+                    <div class="trust-node">
+
+                        🖥 Application
+
+                    </div>
+
+
+                    <div class="trust-arrow">
+
+                        ↓
+
+                    </div>
+
+
+                    <div class="trust-node">
+
+                        🗄 Database
+
+                    </div>
+
+
+                    <div class="trust-arrow">
+
+                        ↓
+
+                    </div>
+
+
+                    {% if latest_request %}
+
+
+                        {% if latest_request[6] == 'ALLOW' %}
+
+
+                            <div class="trust-decision allow-box">
+
+                                ✅ ALLOW
+
+                            </div>
+
+
+                        {% else %}
+
+
+                            <div class="trust-decision block-box">
+
+                                ⛔ BLOCK
+
+                            </div>
+
+
+                        {% endif %}
+
+
+                    {% else %}
+
+
+                        <div class="trust-decision verify-box">
+
+                            ⏳ VERIFY
+
+                        </div>
+
+
+                    {% endif %}
+
+
+                </div>
+
+
+            </div>
+
+
+            <a
+                href="/"
+                class="back-link"
+            >
+
+                ← Back to Dashboard
+
+            </a>
+
+
+        </div>
+
+
+    </div>
+
+
+</body>
+
+</html>

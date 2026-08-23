@@ -1,0 +1,7 @@
+venv/
+__pycache__/
+*.pyc
+zerotrustx_backup.sql
+app_backup_before_deepseek.py
+.DS_Store
+.env
